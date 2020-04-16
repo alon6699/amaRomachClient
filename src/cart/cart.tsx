@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import { Modal, Button, Container, Row } from 'react-bootstrap';
 import CartProduct from './cart-product/cart-product';
-import { ProductProps } from '../models/product.model';
+import { CartProductProp } from '../models/card-product.model';
 
-type propsType = { products: ProductProps[], removeProduct: (id: string) => void };
+interface propsType {
+    cartProducts: CartProductProp[];
+    removeProduct: (id: string) => void;
+    updateAmount: (id: string, amount: number) => void;
+    checkout: () => void;
+};
 
-function Cart({ products, removeProduct }: propsType) {
+const Cart: React.FunctionComponent<propsType> = ({ cartProducts, removeProduct, updateAmount, checkout }) => {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const cartProducts = products.map(product =>
-        <CartProduct product={product} removeProduct={removeProduct}></CartProduct>);
-        
+    const products = cartProducts.map(cartProduct =>
+        <CartProduct key={cartProduct.product._id}
+            cartProduct={cartProduct} removeProduct={() => removeProduct(cartProduct.product._id)}
+            updateAmount={(amount: number) => updateAmount(cartProduct.product._id, amount)}>
+        </CartProduct>);
+
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>cart</Button>
+            <Button variant="primary" onClick={handleShow} size="lg" block>cart</Button>
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -25,7 +33,7 @@ function Cart({ products, removeProduct }: propsType) {
                 <Modal.Body>
                     <Container>
                         <Row>
-                            {cartProducts}
+                            {products}
                         </Row>
                     </Container>
                 </Modal.Body>
@@ -33,7 +41,7 @@ function Cart({ products, removeProduct }: propsType) {
                     <Button variant="secondary" onClick={handleClose}>
                         Close
             </Button>
-                    <Button variant="primary" onClick={handleClose}>
+                    <Button variant="primary" onClick={() => { handleClose(); checkout(); }}>
                         checkout
             </Button>
                 </Modal.Footer>

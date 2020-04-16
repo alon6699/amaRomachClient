@@ -1,56 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
 import Products from './products/products';
-import { ProductProps } from './models/product.model';
 import Cart from './cart/cart';
+import { ProductProp } from './models/product.model';
+import { ShopProduct } from './models/shop-product.model';
+import { CartProductProp } from './models/card-product.model';
+import { Container, Row, Col } from 'react-bootstrap';
 
-function App() {
-  const products: ProductProps[] = [
-       {
-         "name": "Oatmeal",
-         "description": "Hot and fluffy oatmeal & protein powder cake",
-         "price": 330.00,
-         "image": "../assets/images/oatmeal.jpg",
-         "limit": 30
-       },
-       {
-         "name": "WS License",
-         "description": "Rare WS license. No need for military email",
-         "price": 200.00,
-         "image": "../assets/images/ws.png"
-       },
-       {
-         "name": "Coconut",
-         "description": "Good coconut to make oil for your beard",
-         "price": 100.00,
-         "image": "../assets/images/coconut.png",
-         "limit": 5
-       },
-       {
-         "name": "Beard Exempt",
-         "description": "Your very own license to grow beard",
-         "price": 777.00,
-         "image": "../assets/images/beard.jpg",
-         "limit": 10
-       },
-       {
-         "name": "A Day Off",
-         "description": "1 day off work",
-         "price": 1000000.00,
-         "image": "../assets/images/freedom.png"
-       },
-       {
-         "name": "JS Book for Beginners",
-         "description": "Digital javascript book to start coding your first js website",
-         "price": 330.00,
-         "image": "../assets/images/js-book.png"
-       }
-     ]
+const App: React.FunctionComponent<any> = () => {
+  const [products, setProducts] = useState<ProductProp[]>([]);
+  const [cart, setCart] = useState<Record<string, number>>({});
+
+  const onCartAction = (id: string) => {
+    if (cart[id]) {
+      const newCart = { ...cart };
+      delete newCart[id];
+      setCart(newCart);
+    } else {
+      setCart({ ...cart, [id]: 1 });
+    }
+  }
+
+  const updateAmount = (id: string, amount: number) => {
+    setCart({ ...cart, [id]: amount });
+  }
+
+  const checkout = () => {
+    setCart({});
+  }
+
+  useEffect(() => {
+    fetch('http://localhost:3000/products/')
+      .then(res => res.json())
+      .then(result => {
+        setProducts(result);
+      }).catch(console.error);
+  }, [])
+
+  const shopProducts = (): ShopProduct[] =>
+    products.map(product => ({ product, isInCart: !!cart[product._id] }));
+
+  const cartProducts = (): CartProductProp[] =>
+    Object.keys(cart).map(id =>
+      ({ product: products.find(product => product._id === id) as ProductProp, amount: cart[id] }));
+
   return (
-    <div>
-      <Products products={products}></Products>
-      <Cart products={products} removeProduct={() => null}></Cart>
-    </div>
+    <Container fluid="md">
+      <Row>
+        <Col>
+          <Products products={shopProducts()} onCartAction={onCartAction}></Products>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col>
+          <Cart cartProducts={cartProducts()}
+            removeProduct={onCartAction}
+            updateAmount={updateAmount}
+            checkout={checkout}
+          ></Cart>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

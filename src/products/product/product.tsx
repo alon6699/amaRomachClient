@@ -1,8 +1,14 @@
 import React from "react";
 import { Card, Button } from "react-bootstrap";
-import { ProductProps } from "../../models/product.model";
+import { ProductProp } from "../../models/product.model";
 
-const Product = (props: { product: ProductProps, isInCart: boolean, onCartAction: () => void }) => {
+interface propsType {
+    product: ProductProp;
+    isInCart: boolean;
+    onCartAction: () => void
+}
+
+const Product: React.FunctionComponent<propsType> = (props) => {
     const actionButton = !props.isInCart ?
         <Button variant="primary" onClick={props.onCartAction}>add</Button> :
         <Button variant="secondary" onClick={props.onCartAction}>remove</Button>

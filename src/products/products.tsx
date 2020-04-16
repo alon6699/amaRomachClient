@@ -1,29 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { ProductProps } from '../models/product.model';
 import Product from './product/product';
+import { ShopProduct } from '../models/shop-product.model';
 
-const Products = ({ products }: { products: ProductProps[] }) => {
-    const [cart, setCart]: [Record<string, number>, (cart: Record<string, number>) => void] = useState({});
-
-    const onCartAction = (id: string) => {
-        return () => {
-            if (cart[id]) {
-                const newCart = { ...cart };
-                delete newCart[id];
-                setCart(newCart);
-            } else {
-                setCart({ ...cart, [id]: 1 });
-            }
-        };
-    }
-
-    const listItems = products.map(product =>
-        <Col>
-            <Product key={product.name.toString()}
+interface propsType {
+    products: ShopProduct[];
+    onCartAction: (id: string) => void
+};
+const Products: React.FunctionComponent<propsType> = ({ products, onCartAction }) => {
+    const listItems = products.map(({ product, isInCart }) =>
+        <Col key={product._id}>
+            <Product key={product._id}
                 product={product}
-                isInCart={!!cart[product.name]}
-                onCartAction={onCartAction(product.name)}
+                isInCart={isInCart}
+                onCartAction={() => onCartAction(product._id)}
             ></Product>
         </Col>
     );
