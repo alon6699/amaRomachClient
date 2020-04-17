@@ -9,9 +9,12 @@ interface propsType {
 }
 
 const Product: React.FunctionComponent<propsType> = (props) => {
-    const actionButton = !props.isInCart ?
-        <Button variant="primary" onClick={props.onCartAction}>add</Button> :
-        <Button variant="secondary" onClick={props.onCartAction}>remove</Button>
+    const actionButton =
+        props.isInCart ?
+            <Button variant="secondary" onClick={props.onCartAction}>remove</Button> :
+            props.product.limit === 0 ?
+                <Button variant="danger" disabled>out of stock</Button> :
+                <Button variant="primary" onClick={props.onCartAction}>add</Button>
     return (
         <Card style={{ width: '18rem' }} >
             <Card.Body>

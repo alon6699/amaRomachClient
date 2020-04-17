@@ -10,17 +10,17 @@ interface propsType {
 
 const CartProduct: React.FunctionComponent<propsType> = ({ cartProduct, removeProduct, updateAmount }) => {
     let input;
-    if (!cartProduct.product.limit) {
-        input = <Form.Control type="number" value={cartProduct.amount}
-            onInput={(e: FormEvent<FormControl & HTMLInputElement>) =>
-                updateAmount(e.currentTarget.value as any)} />;
-    } else {
-        const options = Array.from({ length: cartProduct.product.limit }, ((v, index) =>
+    if (cartProduct.product.limit !== undefined && cartProduct.product.limit !== null) {
+        const options = Array.from({ length: cartProduct.product.limit + cartProduct.amount }, ((v, index) =>
             <option key={index + 1} value={index + 1} onChange={() => updateAmount(index + 1)}>{index + 1}</option>));
         input = <Form.Control value={cartProduct.amount} as="select"
-            onChange={(e: FormEvent<HTMLSelectElement>) => updateAmount(e.currentTarget.value as any)}>
+            onChange={(e: FormEvent<HTMLSelectElement>) => updateAmount(parseInt(e.currentTarget.value))}>
             {options}
         </Form.Control>;
+    } else {
+        input = <Form.Control type="number" value={cartProduct.amount}
+            onInput={(e: FormEvent<FormControl & HTMLInputElement>) =>
+                updateAmount(parseInt(e.currentTarget.value))} />;
     }
 
     return (
