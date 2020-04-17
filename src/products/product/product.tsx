@@ -13,8 +13,7 @@ const Product: React.FunctionComponent<propsType> = (props) => {
         <Button variant="primary" onClick={props.onCartAction}>add</Button> :
         <Button variant="secondary" onClick={props.onCartAction}>remove</Button>
     return (
-        <Card style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="holder.js/100px180" />
+        <Card style={{ width: '18rem' }} >
             <Card.Body>
                 <Card.Title>{props.product.name}</Card.Title>
                 <Card.Text>{props.product.description}</Card.Text>

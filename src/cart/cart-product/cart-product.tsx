@@ -25,7 +25,6 @@ const CartProduct: React.FunctionComponent<propsType> = ({ cartProduct, removePr
 
     return (
         <Card style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="holder.js/100px180" />
             <Card.Body>
                 <Card.Title>{cartProduct.product.name}</Card.Title>
                 <Card.Text>{cartProduct.product.description}</Card.Text>
