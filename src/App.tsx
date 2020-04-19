@@ -9,8 +9,8 @@ import { CartProductProp } from './models/card-product.model';
 import { reducer } from './products/products.reducer';
 import { initWebSocket, manageCartItem, emitCheckout } from './web-socket';
 
-const GET_PRODUCTS_URL = 'http://localhost:3000/products/';
-const WEB_SOCKET_URL = 'ws://localhost:3000/';
+const GET_PRODUCTS_URL = 'http://localhost:3001/products/';
+const WEB_SOCKET_URL = 'ws://localhost:3001/';
 
 const App: React.FunctionComponent<any> = () => {
   const [products, dispatch] = useReducer(reducer, []);
@@ -32,26 +32,18 @@ const App: React.FunctionComponent<any> = () => {
     }
   };
 
-  const checkout = () => {
-    emitCheckout();
-    setCart({});
-  };
-
-  const productChanges = (product: ProductProp) => {
-    dispatch({ type: 'productChange', payload: product });
-  }
-
   useEffect(() => {
     fetch(GET_PRODUCTS_URL)
       .then(res => res.json())
       .then(products => {
         dispatch({ type: 'products', payload: products });
         initWebSocket(WEB_SOCKET_URL, {
-           'productChanges': productChanges 
-          })
+          'productChanges': (product: ProductProp) =>
+            dispatch({ type: 'productChange', payload: product }),
+          'checkout': (error) => {setCart({}); if(error) {console.error(error)}}
+        })
       }).catch(console.error);
   }, []);
-
 
   const shopProducts = (): ShopProduct[] =>
     products.map((product: ProductProp) => ({ product, isInCart: !!cart[product._id] }));
@@ -72,7 +64,7 @@ const App: React.FunctionComponent<any> = () => {
           <Cart cartProducts={cartProducts()}
             removeProduct={onCartAction}
             updateAmount={updateAmount}
-            checkout={checkout}
+            checkout={emitCheckout}
           ></Cart>
         </Col>
       </Row>
