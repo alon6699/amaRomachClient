@@ -1,0 +1,4 @@
+{
+    "SERVER_URL": "http://localhost:3001/products/",
+    "WEB_SOCKET_URL": "ws://localhost:3001/"
+}

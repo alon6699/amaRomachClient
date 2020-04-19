@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import * as config from './config/config.json';
 import './App.scss';
 import Products from './products/products';
 import Cart from './cart/cart';
@@ -8,9 +9,6 @@ import { ShopProduct } from './models/shop-product.model';
 import { CartProductProp } from './models/card-product.model';
 import { reducer } from './products/products.reducer';
 import { initWebSocket, manageCartItem, emitCheckout } from './web-socket';
-
-const GET_PRODUCTS_URL = 'http://localhost:3001/products/';
-const WEB_SOCKET_URL = 'ws://localhost:3001/';
 
 const App: React.FunctionComponent<any> = () => {
   const [products, dispatch] = useReducer(reducer, []);
@@ -33,14 +31,14 @@ const App: React.FunctionComponent<any> = () => {
   };
 
   useEffect(() => {
-    fetch(GET_PRODUCTS_URL)
+    fetch(config.SERVER_URL)
       .then(res => res.json())
       .then(products => {
         dispatch({ type: 'products', payload: products });
-        initWebSocket(WEB_SOCKET_URL, {
+        initWebSocket({
           'productChanges': (product: ProductProp) =>
             dispatch({ type: 'productChange', payload: product }),
-          'checkout': (error) => {setCart({}); if(error) {console.error(error)}}
+          'checkout': ({error}) => { setCart({}); if (error) { console.error(error) } }
         })
       }).catch(console.error);
   }, []);
