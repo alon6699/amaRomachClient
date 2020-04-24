@@ -12,7 +12,7 @@ export const initWebSocket = (events: Record<string, (data: any) => void>) => {
 
 export const manageCartItem = (id: string, amount: number) => {
     if (socket) {
-        socket.emit('manageProductInCart', { id, amount });
+        socket.emit('updateProductInCart', { id, amount });
     } else {
         throw new Error('socket is not connected');
     }

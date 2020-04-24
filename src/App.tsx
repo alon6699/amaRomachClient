@@ -8,7 +8,7 @@ import { ProductProp } from './models/product.model';
 import { ShopProduct } from './models/shop-product.model';
 import { CartProductProp } from './models/card-product.model';
 import { reducer } from './products/products.reducer';
-import { initWebSocket, manageCartItem, emitCheckout } from './web-socket';
+import { initWebSocket, manageCartItem } from './web-socket';
 
 const App: React.FunctionComponent<any> = () => {
   const [products, dispatch] = useReducer(reducer, []);
@@ -30,17 +30,22 @@ const App: React.FunctionComponent<any> = () => {
     }
   };
 
+  const checkout = () => {
+    fetch(config.CHECKOUT, { credentials: 'include', method: 'POST' })
+      .catch(console.error)
+      .finally(() => setCart({}));
+  }
+
   useEffect(() => {
-    fetch(config.SERVER_URL)
+    fetch(config.SERVER_URL, { credentials: 'include' })
       .then(res => res.json())
       .then(products => {
         dispatch({ type: 'products', payload: products });
-        initWebSocket({
-          'productChanges': (product: ProductProp) =>
-            dispatch({ type: 'productChange', payload: product }),
-          'checkout': ({error}) => { setCart({}); if (error) { console.error(error) } }
-        })
-      }).catch(console.error);
+      }).catch(console.error).finally(() => initWebSocket({
+        'productChanges': (product: ProductProp) =>
+          dispatch({ type: 'productChange', payload: product }),
+        'checkout': ({ error }) => { setCart({}); if (error) { console.error(error) } }
+      }));
   }, []);
 
   const shopProducts = (): ShopProduct[] =>
@@ -62,7 +67,7 @@ const App: React.FunctionComponent<any> = () => {
           <Cart cartProducts={cartProducts()}
             removeProduct={onCartAction}
             updateAmount={updateAmount}
-            checkout={emitCheckout}
+            checkout={checkout}
           ></Cart>
         </Col>
       </Row>

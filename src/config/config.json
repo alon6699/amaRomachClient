@@ -1,4 +1,5 @@
 {
     "SERVER_URL": "http://localhost:3001/products/",
+    "CHECKOUT": "http://localhost:3001/checkout",
     "WEB_SOCKET_URL": "ws://localhost:3001/"
 }
